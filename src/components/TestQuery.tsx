@@ -14,7 +14,7 @@ import supabase from "@/utils/supabase";
 
 const putRow = async (data: { id: string; info: string; checked: boolean }) => {
   const { id, ...body } = data;
-  await new Promise((resolve) => setTimeout(resolve, 5000));
+  await new Promise((resolve) => setTimeout(resolve, 2000));
   const res = await supabase.from("rows").update(body).eq("id", id);
 };
 
@@ -34,11 +34,13 @@ const getRow = async (id: string) => {
 };
 
 const postRow = async (data: { info: string }) => {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
   const response = await supabase.from("rows").insert(data);
 };
 
 const TestQuery = () => {
   const queryClient = useQueryClient();
+
   // Queries
   const { data: rows, isLoading: isLoadingRows } = useQuery({
     queryKey: ["rows"],
