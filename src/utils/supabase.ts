@@ -6,7 +6,7 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 const handleInserts = (queryKey: string[]) => {
-  queryClient.invalidateQueries({ queryKey });
+  // queryClient.invalidateQueries({ queryKey });
 };
 
 supabase
