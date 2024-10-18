@@ -14,7 +14,7 @@ export const putRow = async (data: {
 
 export const getRows = async () => {
   const toastId = toast.loading("Loading...");
-  // await new Promise((resolve) => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   const rows = await supabase
     .from("rows")
     .select("*")

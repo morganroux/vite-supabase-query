@@ -6,10 +6,11 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import supabase from "./utils/supabase";
 import { Button, Container, Typography } from "@mui/material";
 import TestQuery from "./components/TestQuery";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
-
+  const queryClient = useQueryClient();
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -30,7 +31,15 @@ export default function App() {
     return (
       <Container>
         <Typography>Logged in!</Typography>
-        <Button onClick={() => supabase.auth.signOut()}>Sign out</Button>
+        <Button
+          onClick={() => {
+            // clearing cache when logging out
+            queryClient.clear();
+            supabase.auth.signOut();
+          }}
+        >
+          Sign out
+        </Button>
         <TestQuery />
       </Container>
     );

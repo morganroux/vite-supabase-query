@@ -8,12 +8,11 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { RowType } from "@/types/rows";
 import { Add, Delete } from "@mui/icons-material";
-import { useRef } from "react";
 import { getRows, putRow, postRow, deleteRow } from "@/dao/rows";
+import { editing } from "@/utils/react-query";
 
 const TestQuery = () => {
   const queryClient = useQueryClient();
-  const editing = useRef(0);
   // Queries
   const { data: rows, isLoading: isLoadingRows } = useQuery({
     queryKey: ["rows"],
@@ -25,7 +24,7 @@ const TestQuery = () => {
     mutationKey: ["rows", "put"],
     mutationFn: putRow,
     onMutate: async (data) => {
-      editing.current++;
+      editing.set("rows", (editing.get("rows") ?? 0) + 1);
       await queryClient.cancelQueries({ queryKey: ["rows"] });
       const previousRows = queryClient.getQueryData(["rows"]);
       queryClient.setQueryData(["rows"], (old: RowType[] | undefined) => {
@@ -35,10 +34,10 @@ const TestQuery = () => {
       });
       return { previousRows };
     },
-    // Always refetch after error or success:
     onSettled: async (data, err, variables) => {
-      editing.current--;
-      if (editing.current === 0)
+      editing.set("rows", (editing.get("rows") ?? 0) - 1);
+      // if websocket is enabled, we don't need to invalidate the query
+      if (editing.get("rows") == 0)
         await queryClient.invalidateQueries({ queryKey: ["rows"] });
     },
   });
@@ -47,7 +46,8 @@ const TestQuery = () => {
     mutationKey: ["rows", "post"],
     mutationFn: postRow,
     onMutate: async (data) => {
-      editing.current++;
+      editing.set("rows", (editing.get("rows") ?? 0) + 1);
+
       await queryClient.cancelQueries({ queryKey: ["rows"] });
       const previousRows = queryClient.getQueryData(["rows"]);
       queryClient.setQueryData(["rows"], (old: RowType[] | undefined) => {
@@ -67,8 +67,9 @@ const TestQuery = () => {
       console.log("Error", error);
     },
     onSettled: async (data, err, variables) => {
-      editing.current--;
-      if (editing.current === 0)
+      editing.set("rows", (editing.get("rows") ?? 0) - 1);
+
+      if (editing.get("rows") == 0)
         await queryClient.invalidateQueries({ queryKey: ["rows"] });
     },
   });
@@ -77,7 +78,8 @@ const TestQuery = () => {
     mutationKey: ["rows", "delete"],
     mutationFn: deleteRow,
     onMutate: async (id) => {
-      editing.current++;
+      editing.set("rows", (editing.get("rows") ?? 0) + 1);
+
       await queryClient.cancelQueries({ queryKey: ["rows"] });
       const previousRows = queryClient.getQueryData(["rows"]);
       queryClient.setQueryData(["rows"], (old: RowType[] | undefined) => {
@@ -88,8 +90,8 @@ const TestQuery = () => {
       return { previousRows };
     },
     onSettled: async (data, err, variables) => {
-      editing.current--;
-      if (editing.current === 0)
+      editing.set("rows", (editing.get("rows") ?? 0) - 1);
+      if (editing.get("rows") == 0)
         await queryClient.invalidateQueries({ queryKey: ["rows"] });
     },
   });
