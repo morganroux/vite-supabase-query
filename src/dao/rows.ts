@@ -10,6 +10,7 @@ export const putRow = async (data: {
   const { id, ...body } = data;
   await new Promise((resolve) => setTimeout(resolve, 2000));
   const res = await supabase.from("rows").update(body).eq("id", id);
+  console.log("===put", res);
 };
 
 export const getRows = async () => {
@@ -19,15 +20,19 @@ export const getRows = async () => {
     .from("rows")
     .select("*")
     .order("id", { ascending: true });
+  if (rows.error) {
+    toast.remove(toastId);
+    throw rows.error;
+  }
   toast.success("Loaded", { id: toastId });
   return rows.data ?? ([] as RowType[]);
 };
 
-export const getRow = async (id: string) => {
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-  const row = await supabase.from("rows").select("*").eq("id", id).single();
-  return row.data as RowType;
-};
+// export const getRow = async (id: string) => {
+//   await new Promise((resolve) => setTimeout(resolve, 2000));
+//   const row = await supabase.from("rows").select("*").eq("id", id).single();
+//   return row.data as RowType;
+// };
 
 export const postRow = async (data: { info: string }) => {
   await new Promise((resolve) => setTimeout(resolve, 2000));
