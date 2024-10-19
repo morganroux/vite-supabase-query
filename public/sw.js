@@ -1,11 +1,13 @@
+const cacheName = "v1";
+
 const addResourcesToCache = async (resources) => {
-  const cache = await caches.open("v1");
+  const cache = await caches.open(cacheName);
   await cache.addAll(resources);
 };
 
 const putInCache = async (request, response) => {
   if (request.url.match("chrome-extension")) return;
-  const cache = await caches.open("v1");
+  const cache = await caches.open(cacheName);
   await cache.put(request, response);
 };
 const networkFirst = async ({ request }) => {
@@ -79,7 +81,19 @@ const enableNavigationPreload = async () => {
 };
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(enableNavigationPreload());
+  // event.waitUntil(enableNavigationPreload());
+  e.waitUntil(
+    caches.keys().then((keyList) => {
+      return Promise.all(
+        keyList.map((key) => {
+          if (key === cacheName) {
+            return;
+          }
+          return caches.delete(key);
+        })
+      );
+    })
+  );
 });
 
 self.addEventListener("install", (event) => {

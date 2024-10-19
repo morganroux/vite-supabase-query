@@ -4,9 +4,14 @@ import { Session } from "@supabase/supabase-js";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import supabase from "./utils/supabase";
-import { Button, Container, Typography } from "@mui/material";
+
 import TestQuery from "./components/TestQuery";
 import { useQueryClient } from "@tanstack/react-query";
+import TestPouch from "./components/TestPouch";
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -41,6 +46,8 @@ export default function App() {
           Sign out
         </Button>
         <TestQuery />
+        <Divider />
+        <TestPouch />
       </Container>
     );
   }
