@@ -7,6 +7,23 @@ const putInCache = async (request, response) => {
   const cache = await caches.open("v1");
   await cache.put(request, response);
 };
+const networkFirst = async ({ request }) => {
+  console.log("networkFirst", request.url);
+  try {
+    const response = await fetch(request.clone());
+    putInCache(request, response.clone());
+    return response;
+  } catch (error) {
+    const responseFromCache = await caches.match(request);
+    if (responseFromCache) {
+      return responseFromCache;
+    }
+    return new Response("Network error happened", {
+      status: 408,
+      headers: { "Content-Type": "text/plain" },
+    });
+  }
+};
 
 const cacheFirst = async ({ request, preloadResponsePromise, fallbackUrl }) => {
   console.log("cacheFirst", request.url);
@@ -69,10 +86,10 @@ self.addEventListener("install", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
-  // if (event.request.url.match("supabase.co")) {
-  //   console.log("fetching from supabase");
-  //   return;
-  // }
+  if (event.request.url.match("supabase.co")) {
+    console.log("fetching from supabase");
+    return;
+  }
   event.respondWith(
     cacheFirst({
       request: event.request,
