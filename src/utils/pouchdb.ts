@@ -1,5 +1,6 @@
 import PouchDB from "pouchdb";
 
+
 // Local PouchDB database
 export const localDB = new PouchDB("local_todos");
 

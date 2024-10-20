@@ -12,6 +12,7 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
+import TestUndo from "./components/TestUndo";
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -45,8 +46,10 @@ export default function App() {
         >
           Sign out
         </Button>
+        <Divider sx={{ m: 3 }} />
+        <TestUndo />
         <TestQuery />
-        <Divider />
+        <Divider sx={{ m: 3 }} />
         <TestPouch />
       </Container>
     );
