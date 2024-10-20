@@ -7,7 +7,7 @@ const TestUndo = () => {
   const [count1, setCount1] = useStateWithUndo(0);
   const [count2, setCount2] = useStateWithUndo(0);
   const { undo, redo, canUndo, canRedo } = useUndoRedo();
-  console.log("rerednere")
+  console.log("rerednere");
   return (
     <Stack>
       <Stack direction="row" sx={{ gap: 3 }}>
@@ -15,7 +15,9 @@ const TestUndo = () => {
         <Typography>Count2: {count2}</Typography>
       </Stack>
       <Stack direction="row">
-        <Button onClick={() => setCount1(count1 + 1)}>Increment count1</Button>
+        <Button onClick={() => setCount1((count) => count + 1)}>
+          Increment count1
+        </Button>
         <Button onClick={() => setCount2(count2 + 1)}>Increment count2</Button>
         <Button disabled={!canUndo} onClick={() => undo()}>
           Undo

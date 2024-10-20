@@ -10,19 +10,12 @@ class Undoer {
     this.maxIndex = maxIndex;
   }
 
-  addUndoableAction<T>({
-    action,
-    prev,
-    next,
-  }: {
-    action: React.Dispatch<React.SetStateAction<T>>;
-    prev: T;
-    next: T;
-  }) {
-    this.history = this.history.slice(0, this.index + 1);
+  addUndoableAction(props: { undoAction: () => void; redoAction: () => void }) {
+    if (this.index < this.history.length - 1)
+      this.history = this.history.slice(0, this.index + 1);
     this.history.push({
-      undo: () => action(_.cloneDeep(prev)), // do we need to deep clone ??
-      redo: () => action(_.cloneDeep(next)),
+      undo: props.undoAction,
+      redo: props.redoAction,
     });
     this.index++;
     if (this.history.length >= this.maxIndex) {
@@ -66,9 +59,8 @@ export const useStateWithUndo = <T,>(initialValue: T) => {
           ? (newState as (prevState: T) => T)(prevState)
           : newState;
       addUndoableAction({
-        action: setState,
-        prev: prevState,
-        next,
+        undoAction: () => setState(_.cloneDeep(prevState)),
+        redoAction: () => setState(_.cloneDeep(next)),
       });
 
       return next;
@@ -83,14 +75,9 @@ const UndoRedoContext = createContext<{
   canRedo: boolean;
   undo: () => void;
   redo: () => void;
-  addUndoableAction: <T>({
-    action,
-    prev,
-    next,
-  }: {
-    action: React.Dispatch<React.SetStateAction<T>>;
-    prev: T;
-    next: T;
+  addUndoableAction: (props: {
+    undoAction: () => void;
+    redoAction: () => void;
   }) => void;
 } | null>(null);
 
@@ -119,20 +106,8 @@ export const UndoRedoProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [updateUndoRedoState]);
 
   const addUndoableAction = useCallback(
-    <T,>({
-      action,
-      prev,
-      next,
-    }: {
-      action: React.Dispatch<React.SetStateAction<T>>;
-      prev: T;
-      next: T;
-    }) => {
-      undoer.addUndoableAction({
-        action,
-        prev,
-        next,
-      });
+    (props: { undoAction: () => void; redoAction: () => void }) => {
+      undoer.addUndoableAction(props);
       updateUndoRedoState();
     },
     [updateUndoRedoState]
