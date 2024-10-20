@@ -8,6 +8,7 @@ import queryClient, { localStoragePersister } from "./utils/react-query.ts";
 import "@/utils/pouchdb";
 import { Toaster } from "react-hot-toast";
 import { registerServiceWorker } from "./workers/serviceWorker.ts";
+import { UndoRedoProvider } from "./utils/undoer.tsx";
 // import './index.css'
 
 // registerServiceWorker();
@@ -24,7 +25,9 @@ createRoot(document.getElementById("root")!).render(
         });
       }}
     >
-      <App />
+      <UndoRedoProvider>
+        <App />
+      </UndoRedoProvider>
       <ReactQueryDevtools initialIsOpen />
     </PersistQueryClientProvider>
     <Toaster />
